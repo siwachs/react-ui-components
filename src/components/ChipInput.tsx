@@ -37,8 +37,6 @@ const ChipInput: React.FC<ChipInputProps> = ({ items, className, style }) => {
     );
     setSelectedChips((prevChips) => [...prevChips, item]);
     setInputValue("");
-    setHighlightLastChip(false);
-    setShowList(false);
   };
   const handleItemClickDebounced = debounce(handleItemClick, 300);
 
@@ -46,7 +44,6 @@ const ChipInput: React.FC<ChipInputProps> = ({ items, className, style }) => {
     const removedChip = selectedChips[index];
     setAvailableItems((prevItems) => [...prevItems, removedChip]);
     setSelectedChips((prevChips) => prevChips.filter((_, i) => i !== index));
-    setHighlightLastChip(false);
   };
 
   const handleBackspace = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -101,7 +98,7 @@ const ChipInput: React.FC<ChipInputProps> = ({ items, className, style }) => {
         onClick={() => handleItemClickDebounced(item)}
         onKeyDown={() => {}}
         tabIndex={0}
-        className="cursor-pointer hover:bg-gray-200 p-2 text-xs grid grid-cols-2"
+        className="cursor-pointer hover:bg-gray-200 p-2 text-sm grid grid-cols-2"
       >
         <div className="flex items-center">
           <img
@@ -111,7 +108,9 @@ const ChipInput: React.FC<ChipInputProps> = ({ items, className, style }) => {
           />
           <span className="font-semibold">{item.username}</span>
         </div>
-        <span className="text-gray-400">{item.email}</span>
+        <span className="text-gray-400 overflow-hidden whitespace-nowrap">
+          {item.email}
+        </span>
       </li>
     ));
 
@@ -142,7 +141,7 @@ const ChipInput: React.FC<ChipInputProps> = ({ items, className, style }) => {
 
       {showList && availableItems.length > 0 && (
         <ul
-          className="bg-white border rounded max-w-64 w-full max-h-64 overflow-y-auto"
+          className="bg-white border rounded max-w-72 w-full max-h-64 overflow-y-auto"
           style={{
             position: "absolute",
             top: `${listPosition.top}px`,
