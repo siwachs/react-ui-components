@@ -9,23 +9,27 @@ import {
   useRef,
 } from "react";
 
-// Data is going to be of 3X3
+// Data is going to be of 3X3 or Dynamic
 const SHAPE_DATA = [
-  [1, 1, 1],
-  [1, 0, 0],
-  [1, 1, 1],
+  [1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 1, 0],
+  [1, 1, 1, 1, 0, 1],
 ];
 
 const Shape: React.FC<{ data: number[][] }> = ({ data }) => {
-  const flattenData = useMemo(() => data.flat(Infinity), [data]);
+  // Update it to work with Dynamic Matrix
+  // const flattenData = useMemo(() => data.flat(Infinity), [data]);
+
   const noOfVisibleBoxes = useMemo(
     () =>
-      flattenData.reduce((acc: number, box) => {
-        if (box === 1) acc += 1;
+      data.reduce((acc: number, row) => {
+        row.forEach((box) => {
+          if (box === 1) acc += 1;
+        });
 
         return acc;
       }, 0),
-    [flattenData],
+    [data],
   );
 
   const [activeBoxes, setActiveBoxes] = useState(new Set());
@@ -47,10 +51,12 @@ const Shape: React.FC<{ data: number[][] }> = ({ data }) => {
   const startDeselectBoxes = useCallback(() => {
     setStartDeselectBoxesLoading(true);
     const activeKeys = Array.from(activeBoxes.keys());
+    let index = 0;
 
     const removeActiveKeys = () => {
-      if (activeKeys.length) {
-        const currentActivekey = activeKeys.shift();
+      if (activeKeys[index] !== undefined) {
+        const currentActivekey = activeKeys[index];
+        index += 1;
 
         setActiveBoxes((prev) => {
           const updatedSet = new Set(prev);
@@ -75,23 +81,32 @@ const Shape: React.FC<{ data: number[][] }> = ({ data }) => {
 
   return (
     <div
+      title="Interactive Shape"
       role="button"
       tabIndex={0}
       // To Bubble UP event to parent
       onClick={eventDeligationHandler}
-      className="grid w-fit grid-cols-3 gap-5 p-14"
+      className="w-fit p-14"
     >
-      {flattenData.map((box, index) => {
-        const hiddenBox = box === 0;
-        const isActive = activeBoxes.has(index.toString());
-
+      {data.map((row, rowIndex) => {
         return (
-          <div
-            data-hidden-box={hiddenBox}
-            data-index={index}
-            key={index}
-            className={`${hiddenBox && "pointer-events-none opacity-0"} ${isActive && "pointer-events-none bg-green-400"} size-20 border border-black transition-colors`}
-          />
+          <div key={rowIndex} className="flex gap-5 pb-5 last:pb-0">
+            {row.map((column, columnIndex) => {
+              const hiddenBox = column === 0;
+
+              const index = `${rowIndex}${columnIndex}`;
+              const isActive = activeBoxes.has(index);
+
+              return (
+                <div
+                  data-hidden-box={hiddenBox}
+                  data-index={index}
+                  key={index}
+                  className={`${hiddenBox && "pointer-events-none opacity-0"} ${isActive && "pointer-events-none bg-green-400"} size-20 border border-black transition-colors`}
+                />
+              );
+            })}
+          </div>
         );
       })}
     </div>
