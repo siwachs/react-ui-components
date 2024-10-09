@@ -1,3 +1,9 @@
+import LazyLoadImage from "@/Questions/LazyLoadImage";
+
 export default function Home() {
-  return <main></main>;
+  return (
+    <main>
+      <LazyLoadImage />
+    </main>
+  );
 }
