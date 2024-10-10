@@ -11,13 +11,23 @@ function reduce(callback, initialValue) {
   if (!callback || typeof callback !== "function")
     throw new TypeError(`${callback} is not a function`);
 
-  console.log("NO of Args is = ", arguments.length);
+  console.log("No of Args is = ", arguments.length);
   if (this.length === 0)
     if (arguments.length < 2)
       throw new TypeError("Reduce of emty array with no initialValue");
     else if (arguments.length === 2) {
       return initialValue;
     }
+
+  let k = 0;
+  let acc = initialValue;
+
+  while (k < this.length) {
+    acc = callback(acc, this[k], k, this);
+    k++;
+  }
+
+  return acc;
 }
 
 module.exports = reduce;

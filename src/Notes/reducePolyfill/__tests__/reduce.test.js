@@ -36,4 +36,8 @@ describe("Reduce Functionality", () => {
 
     expect([].customReduce(sum, initialValue)).toBe(initialValue);
   });
+
+  test("Invoked with initial value", () => {
+    expect([1, 2, 3].customReduce(sum, 1)).toBe(7);
+  });
 });
