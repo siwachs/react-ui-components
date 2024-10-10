@@ -26,4 +26,14 @@ describe("Error Conditions", () => {
   });
 });
 
-describe("Reduce Functionality", () => {});
+describe("Reduce Functionality", () => {
+  beforeAll(() => {
+    Array.prototype.customReduce = reduce;
+  });
+
+  test("Invoked on Empty array with initialValue returns initialValue", () => {
+    const initialValue = 0;
+
+    expect([].customReduce(sum, initialValue)).toBe(initialValue);
+  });
+});
