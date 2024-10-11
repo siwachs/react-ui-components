@@ -1,5 +1,5 @@
-"use strict"; // Important otherwise the this refer to Global This if reduce called with call method
-// In strict if we call without a specefic context it refer to undefined
+"use strict";
+// Important: this refer to Global This if reduce called with call method without strict with strict it refer to undefined only if context not provide
 
 function reduce(callback, initialValue) {
   if (this === null || this === undefined) {
@@ -22,8 +22,13 @@ function reduce(callback, initialValue) {
   let k = 0;
   let acc = initialValue;
 
+  if (arguments.length < 2) {
+    acc = this[k++];
+  }
+
   while (k < this.length) {
-    acc = callback(acc, this[k], k, this);
+    if (Object.hasOwn(this, k)) acc = callback(acc, this[k], k, this);
+
     k++;
   }
 
