@@ -44,4 +44,31 @@ describe("Reduce Functionality", () => {
   test("Invoke without initialValue", () => {
     expect([1, 2, 3].customReduce(sum)).toBe(6);
   });
+
+  test("Reduce Promises", () => {
+    function first() {
+      return Promise.resolve(1);
+    }
+
+    function second(v) {
+      return Promise.resolve(v + 2);
+    }
+
+    function third(v) {
+      return Promise.resolve(v + 3);
+    }
+
+    function fourth(v) {
+      return Promise.resolve(v + 4);
+    }
+
+    const promises = [first, second, third, fourth];
+
+    const answer = promises.customReduce(
+      (acc, current) => acc.then(current),
+      Promise.resolve(),
+    );
+
+    expect(answer).resolves.toEqual(10);
+  });
 });
