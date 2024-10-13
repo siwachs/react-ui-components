@@ -39,3 +39,51 @@ function mapLimit(input, limit, iteratorFn, callback) {
 mapLimit(array, 3, getUserId, (allResult) => {
   console.log("Output Result:", allResult);
 });
+
+function maxLimitOptimized(input, limit, fn) {
+  return new Promise((resolve, reject) => {
+    const finalResult = [];
+
+    let index = 0;
+    let activeCount = 0;
+
+    function processNext() {
+      while (activeCount < limit && index < input.length) {
+        const currentIndex = index++;
+        activeCount++;
+
+        Promise.resolve(fn(input[currentIndex]))
+          .then((result) => (finalResult[currentIndex] = result))
+          .catch(reject)
+          .finally(() => {
+            activeCount--;
+            processNext();
+
+            if (index >= input.length && activeCount === 0)
+              resolve(finalResult);
+          });
+      }
+    }
+
+    processNext();
+  });
+}
+
+function asyncOperation(input) {
+  return new Promise(
+    (resolve) => setTimeout(() => resolve(input * 2)),
+    Math.random() * 1000,
+  );
+}
+
+function syncOperation(input) {
+  return input * 2;
+}
+
+maxLimitOptimized(array, 3, asyncOperation)
+  .then((result) => console.log("Async", result))
+  .catch((error) => console.error(JSON.sringify(error.message), null, 2));
+
+maxLimitOptimized(array, 3, syncOperation)
+  .then((result) => console.log("Sync", result))
+  .catch((error) => console.error(JSON.stringify(error.message), null, 2));
