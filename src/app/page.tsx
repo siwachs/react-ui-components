@@ -1,9 +1,3 @@
-import ColorMatchGame from "@/Questions/ColorMatchGame";
-
 export default function Home() {
-  return (
-    <main className="w-screen p-5">
-      <ColorMatchGame />
-    </main>
-  );
+  return <main className="max-w-screen min-h-screen p-5"></main>;
 }
