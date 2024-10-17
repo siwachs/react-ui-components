@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState, useEffect, Dispatch, SetStateAction } from "react";
 
 const TOTAL_BOXES = 12; // Boxes always divisible by 4 it is always going to be a 4 column grid
 
@@ -36,8 +36,11 @@ function getRandomColors(limit: number) {
 
 const Box: React.FC<{
   backgroundColor: string;
-  onClick: (backgroundColor: string) => void;
-}> = ({ backgroundColor, onClick }) => {
+  onClick: (currentBgColor: string) => void;
+  revealedColors: Set<string>;
+  activeColors: string[];
+}> = ({ backgroundColor, onClick, revealedColors, activeColors }) => {
+  const isRevealedColor = revealedColors.has(backgroundColor);
   const [active, setActive] = useState(false);
 
   function toogleActive() {
@@ -46,6 +49,10 @@ const Box: React.FC<{
     setActive(true);
     onClick(backgroundColor);
   }
+
+  useEffect(() => {
+    if (!isRevealedColor && activeColors.length === 0) setActive(false);
+  }, [isRevealedColor, activeColors.length]);
 
   return (
     <div
@@ -59,22 +66,92 @@ const Box: React.FC<{
   );
 };
 
-const ColorMatchGame = () => {
-  const boxes = getRandomColors(TOTAL_BOXES);
+const GameOver: React.FC<{ onClick: () => void; noOfRounds: number }> = ({
+  onClick,
+  noOfRounds,
+}) => {
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <h2 className="text-center text-2xl font-bold">
+        Game Over in {noOfRounds} rounds
+      </h2>
 
-  const [revealedColors, setRevealedColors] = useState(new Set<string>());
-  const [activeColors, setActiveColors] = useState<string[]>([]);
+      <button
+        type="button"
+        className="rounded-md border p-2.5 font-bold"
+        onClick={onClick}
+      >
+        Start Again
+      </button>
+    </div>
+  );
+};
 
-  const onBoxClick = (backgroundColor: string) => {
-    if (activeColors.length === 0) return setActiveColors([backgroundColor]);
+const GameBoard: React.FC<{
+  revealedColors: Set<string>;
+  setRevealedColors: Dispatch<SetStateAction<Set<string>>>;
+  activeColors: string[];
+  setActiveColors: Dispatch<SetStateAction<string[]>>;
+  setNoOfRounds: Dispatch<SetStateAction<number>>;
+}> = ({
+  revealedColors,
+  setRevealedColors,
+  activeColors,
+  setActiveColors,
+  setNoOfRounds,
+}) => {
+  const boxes = useMemo(() => getRandomColors(TOTAL_BOXES), []);
+
+  const onBoxClick = (currentBgColor: string) => {
+    if (activeColors.length === 0) return setActiveColors([currentBgColor]);
+    else if (activeColors[0] === currentBgColor) {
+      setRevealedColors((prev) => new Set(prev.add(currentBgColor)));
+      setActiveColors([]);
+    } else
+      setTimeout(() => {
+        setActiveColors([]);
+      }, 400);
+
+    setNoOfRounds((prev) => prev + 1);
   };
 
   return (
     <div className="grid w-fit grid-cols-4">
       {boxes.map((color, index) => (
-        <Box key={index} backgroundColor={color} onClick={onBoxClick} />
+        <Box
+          key={index}
+          backgroundColor={color}
+          onClick={onBoxClick}
+          revealedColors={revealedColors}
+          activeColors={activeColors}
+        />
       ))}
     </div>
+  );
+};
+
+const ColorMatchGame = () => {
+  const [noOfRounds, setNoOfRounds] = useState(0);
+
+  const [revealedColors, setRevealedColors] = useState(new Set<string>());
+  const [activeColors, setActiveColors] = useState<string[]>([]);
+
+  function startAgain() {
+    setActiveColors([]);
+    setRevealedColors(new Set<string>());
+    setNoOfRounds(0);
+  }
+
+  return revealedColors.size === TOTAL_BOXES / 2 ? (
+    <GameOver onClick={startAgain} noOfRounds={noOfRounds} />
+  ) : (
+    <GameBoard
+      revealedColors={revealedColors}
+      setRevealedColors={setRevealedColors}
+      activeColors={activeColors}
+      setActiveColors={setActiveColors}
+      setNoOfRounds={setNoOfRounds}
+    />
   );
 };
 
