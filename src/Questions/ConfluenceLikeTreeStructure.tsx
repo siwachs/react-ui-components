@@ -7,8 +7,6 @@ import Link from "next/link";
 import { FaChevronRight } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 
-import { AnimatePresence, motion } from "framer-motion";
-
 type Node = { id: number; label: string; link: string; children?: Node[] };
 
 const Node: React.FC<{
@@ -26,6 +24,7 @@ const Node: React.FC<{
       <div className="flex items-center gap-2.5 text-white">
         {node?.children?.length ? (
           <button
+            title={isNodesExpanded ? "Collapse" : "Expand"}
             className={`${isNodesExpanded && "rotate-90"} transition-transform`}
             type="button"
             onClick={expandNodes}
@@ -41,23 +40,13 @@ const Node: React.FC<{
         </Link>
       </div>
 
-      <AnimatePresence>
+      <div
+        className={`max-h-0 opacity-0 transition-all ${isNodesExpanded ? "max-h-full pl-4 opacity-100" : ""}`}
+      >
         {haveChildren && isNodesExpanded && (
-          <motion.div
-            className="pl-4"
-            transition={{ duration: 0.5 }}
-            variants={{
-              collapsed: { height: 0, opacity: 0 },
-              open: { height: "auto", opacity: 1 },
-            }}
-            initial="collapsed"
-            animate="open"
-            exit="collapsed"
-          >
-            <NodeList nodeList={node.children!} />
-          </motion.div>
+          <NodeList nodeList={node.children!} />
         )}
-      </AnimatePresence>
+      </div>
     </li>
   );
 });
