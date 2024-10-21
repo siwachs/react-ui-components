@@ -9,6 +9,8 @@ import { GoDotFill } from "react-icons/go";
 
 type Node = { id: number; label: string; link: string; children?: Node[] };
 
+// NOTE: To optimize children fetching add a new proprty in each node have children and when have children is true use root id to fetch children using API.
+
 const Node: React.FC<{
   node: Node;
 }> = memo(({ node }) => {
