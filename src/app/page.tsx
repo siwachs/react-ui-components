@@ -1,9 +1,9 @@
-import JiraVelocityChat from "@/Questions/jiraVelocityChart";
+import Timer from "@/Questions/Timer";
 
 export default function Home() {
   return (
     <main>
-      <JiraVelocityChat />
+      <Timer />
     </main>
   );
 }
