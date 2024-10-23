@@ -1,0 +1,9 @@
+@keyframes animateBarHeight {
+  0% {
+    height: 0;
+  }
+}
+
+.animateBarHeight {
+  animation: animateBarHeight 400ms forwards;
+}

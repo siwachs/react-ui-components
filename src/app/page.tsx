@@ -1,3 +1,9 @@
+import JiraVelocityChat from "@/Questions/jiraVelocityChart";
+
 export default function Home() {
-  return <main className="max-w-screen min-h-screen"></main>;
+  return (
+    <main>
+      <JiraVelocityChat />
+    </main>
+  );
 }
