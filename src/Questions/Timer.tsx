@@ -3,7 +3,14 @@
 import useTimer from "@/hooks/useTimer";
 
 const Timer = () => {
-  const { isRunning, start, stop } = useTimer(6);
+  const { isRunning, isPaused, pause, resume, start, stop, seconds } =
+    useTimer(6);
+
+  function tooglePauseResume() {
+    if (isPaused) return resume();
+
+    pause();
+  }
 
   return (
     <div>
@@ -13,7 +20,7 @@ const Timer = () => {
 
       <div className="mx-auto flex w-fit flex-col items-center gap-3">
         <span className="select-none text-lg font-bold">
-          {isRunning ? 5 : "No timer running"}
+          {isRunning ? seconds : "No timer running"}
         </span>
 
         <div className="flex items-center gap-5">
@@ -23,6 +30,14 @@ const Timer = () => {
             className="rounded-md border p-3.5 disabled:bg-gray-300"
           >
             Start Timer
+          </button>
+
+          <button
+            onClick={tooglePauseResume}
+            disabled={!isRunning}
+            className="rounded-md border p-3.5 disabled:bg-gray-300"
+          >
+            {isPaused ? "Resume" : "Pause"}
           </button>
 
           <button
