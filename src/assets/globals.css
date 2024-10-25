@@ -7,3 +7,13 @@ html,
 body {
   height: 100%;
 }
+
+/* Chrome Safari */
+.hidden-scrollbar {
+  scrollbar-width: 0; /* Firefox */
+}
+
+/* For WebKit browsers */
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
