@@ -1,11 +1,18 @@
 "use client";
 
+// Keyboard Handling for list
+// Handle API
+// Debounce
+// Caching
+// Improve matching Algo
+
 import {
   useState,
   FormEvent,
   ChangeEvent,
   KeyboardEvent,
   MouseEvent,
+  useEffect,
 } from "react";
 
 import { GRAPHIC_URL, NOOP, BANK_UPI_HANDLES } from "@/data/upi";
@@ -15,20 +22,14 @@ const Form: React.FC = () => {
   const [prediction, setPrediction] = useState("");
   const [predictions, setPredictions] = useState<string[]>([]);
 
-  const changeUpiId = (e: ChangeEvent<HTMLInputElement>) => {
-    const {
-      target: { value = "" },
-    } = e;
-
-    setUpiId(value);
-
-    if (!value.includes("@")) {
+  const getPredictions = (upiId: string) => {
+    if (!upiId.includes("@")) {
       setPredictions([]);
-      return setPrediction(value);
+      return setPrediction(upiId);
     }
 
     // GET Virtual private address(VPA) and Bankname -> VPA@bankName
-    const [currentVPA, currentBankName] = value.split("@");
+    const [currentVPA, currentBankName] = upiId.split("@");
     if (!currentVPA) return;
 
     const bankNameRegex = new RegExp(`${currentBankName}`);
@@ -42,6 +43,20 @@ const Form: React.FC = () => {
     setPrediction(`${currentVPA}@${bankName}`);
   };
 
+  const changeUpiId = (e: ChangeEvent<HTMLInputElement>) => {
+    const {
+      target: { value = "" },
+    } = e;
+
+    setUpiId(value);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => getPredictions(upiId), 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [upiId]);
+
   const onKeyDown = (e: KeyboardEvent) => {
     // Depricated Code
     // const { which = -1, keyCode = -1, code = "" } = e;
@@ -51,18 +66,22 @@ const Form: React.FC = () => {
     const { code = "" } = e;
     if (code === "ArrowRight") {
       setUpiId(prediction);
+
+      setPrediction("");
       setPredictions([]);
     }
   };
 
-  const selectBankNameFromSuggestionBox = (e: MouseEvent) => {
+  const selectBankNameFromSuggestionBoxMouseEvent = (e: MouseEvent) => {
     const {
       currentTarget: { textContent = "" },
     } = e;
 
     const currentVPA = upiId.split("@")[0];
-    setPrediction(`${currentVPA}@${textContent}`);
 
+    setUpiId(`${currentVPA}@${textContent}`);
+
+    setPrediction("");
     setPredictions([]);
   };
 
@@ -87,7 +106,7 @@ const Form: React.FC = () => {
           type="text"
           pattern=".+@.+"
           placeholder="Enter your UPI id"
-          autoCapitalize="off"
+          autoCapitalize="none"
           autoComplete="off"
           spellCheck="false"
           onChange={changeUpiId}
@@ -106,14 +125,13 @@ const Form: React.FC = () => {
       {predictions.length > 0 && (
         <ul className="hidden-scrollbar absolute left-5 top-20 h-auto max-h-[200px] w-[calc(100%-40px)] overflow-y-auto overflow-x-hidden border border-[var(#ebebeb)] bg-white">
           {predictions.map((prediction) => (
-            <li
-              tabIndex={0}
-              onClick={selectBankNameFromSuggestionBox}
-              role="button"
-              key={prediction}
-              className="border-b border-[#ebebeb] py-2.5 text-center hover:bg-[#ebebeb]"
-            >
-              {prediction}
+            <li key={prediction}>
+              <button
+                className="w-full border-b border-[#ebebeb] py-2.5 text-center hover:bg-[#ebebeb] focus:bg-[#ebebeb]"
+                onClick={selectBankNameFromSuggestionBoxMouseEvent}
+              >
+                {prediction}
+              </button>
             </li>
           ))}
         </ul>
